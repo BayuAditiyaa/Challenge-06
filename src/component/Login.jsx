@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import GoogleLogin from "./GoogleLogin";
+import { useDispatch } from "react-redux";
+import {login} from '../Redux/Actions/authActions'
 
-function Login() {
+function Login() {const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -15,39 +15,13 @@ function Login() {
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      let data = JSON.stringify({
-        email,
-        password,
-      });
+    let data = JSON.stringify({
+      email,
+      password,
+    });
 
-      let config = {
-        method: "post",
-        url: `${import.meta.env.VITE_API_URL}auth/login`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: data,
-      };
-
-      const response = await axios.request(config);
-      const { token } = response.data.data;
-
-      localStorage.setItem("token", token);
-
-      navigate("/");
-
-      // Temporary solution
-      // window.location.href = "/";
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response.data.message);
-        return;
-      }
-      toast.error(error.message);
-    }
+    dispatch(login(data, navigate));
   };
-
   return (
     <Container className="p-4">
       <Row className="mb-4">
